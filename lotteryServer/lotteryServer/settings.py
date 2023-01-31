@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/4.1/ref/settings/
 """
 
 from pathlib import Path
+import sys
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,8 +21,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.1/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-!smb^(%f0k*(*5qpcnnd&^*@yxc)ht=lwmi^6q!f7b%r=3qq=r'
+try:
+    sys.path.append(BASE_DIR)
+    from keys.secret_key import SECRET_KEY # pylint: disable=unused-import
+except ImportError:
+
+    from django.utils.crypto import get_random_string
+    keys_dir = os.path.join(BASE_DIR, 'keys')
+    if not os.path.isdir(keys_dir):
+        os.mkdir(keys_dir)
+    with open(os.path.join(keys_dir, 'secret_key.py'), 'w') as f:
+        chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+        f.write("SECRET_KEY = '{}'\n".format(get_random_string(50, chars)))
+    from keys.secret_key import SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
