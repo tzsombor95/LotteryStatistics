@@ -1,2 +1,6 @@
 /lotteryServer/keys/
 lotteryServer/db.sqlite3
+/env
+*.env
+lotteryServer/env
+lotteryServer/*.env
